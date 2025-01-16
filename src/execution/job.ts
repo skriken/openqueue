@@ -28,6 +28,12 @@ export class ActiveJob {
       await this.state.init();
    }
 
+   async changePriority (newPriority: number) {
+      await this.__bullJob.changePriority({
+         priority: newPriority
+      });
+   }
+
    async delay (amountMs: number) {
       await this.__bullJob.moveToDelayed(
         Date.now() + amountMs,

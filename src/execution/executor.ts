@@ -224,6 +224,10 @@ export class StepExecutor {
          stepState.start();
          stepState.data.status = "delayed";
 
+         // Change the job priority so it gets processed after out of delay
+         const delayedPriority = this.jobExecutor.workflow.getDefaultJobOptions().priority?.delayDefaultValue ?? 1;
+         await job.changePriority(delayedPriority);
+
          // Moving job to delayed until specified timestamp
          await job.delay(options.duration);
          // Throw an error which BullMQ recognizes as a sign to just not error the job, just delay it
