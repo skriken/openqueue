@@ -187,7 +187,7 @@ export class Wrapper {
       const jobOptions = JobOptionsSchema.parse(_jobOptions);
       const defaultOptions = this.__workflow.getDefaultJobOptions(true);
       const bullOptions = {
-         priority: jobOptions?.priority ?? defaultOptions.priority?.defaultValue,
+         priority: jobOptions?.priority ?? defaultOptions.priority?.defaultValue ?? 2,
          lifo: (
            jobOptions?.order === "lifo"
          ) || (

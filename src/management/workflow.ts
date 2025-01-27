@@ -130,7 +130,7 @@ export class Workflow<
      bullJob: BullJob,
      bullToken?: string
    ) {
-      console.log(`[Workflow ${ this.__id }]: Processing job ${ bullJob.id }`);
+      // console.log(`[Workflow ${ this.__id }]: Processing job ${ bullJob.id }`);
       const activeJob = new ActiveJob(
         this,
         {

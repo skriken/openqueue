@@ -113,15 +113,15 @@ export class ActiveJobExecutor {
 export type ExecuteStepBaseOptions = {
    id: string;
 };
-export type ExecuteStepResult = {
+export type ExecuteStepResult<T> = {
    success: boolean;
    ran: boolean;
-   result: any;
+   result: T;
 };
-export type ExecuteRunStepOptions =
+export type ExecuteRunStepOptions<Fn extends () => Promise<any> = () => Promise<any>> =
   ExecuteStepBaseOptions
   & {
-   run: () => Promise<any>;
+   run: Fn;
 };
 export type ExecuteSleepStepOptions =
   ExecuteStepBaseOptions
@@ -141,7 +141,10 @@ export class StepExecutor {
 
    }
 
-   async executeRun (options: ExecuteRunStepOptions): Promise<ExecuteStepResult> {
+   async executeRun<
+     T,
+     Ret extends ExecuteStepResult<any>
+   > (options: ExecuteRunStepOptions) {
       const {
          ctx,
          state,
@@ -162,7 +165,7 @@ export class StepExecutor {
             success: true,
             ran: false,
             result: stepState.data.result
-         };
+         } as Ret;
       }
 
       ctx.log(
@@ -171,13 +174,13 @@ export class StepExecutor {
       );
 
       try {
-         const stepResult = await options.run();
+         const stepResult = await options.run() as T;
          stepState.complete(stepResult);
          return {
             success: true,
             ran: true,
             result: stepResult
-         };
+         } as Ret;
       }
       catch (e) {
          ctx.log(
@@ -199,7 +202,7 @@ export class StepExecutor {
       }
    }
 
-   async executeSleep (options: ExecuteSleepStepOptions): Promise<ExecuteStepResult> {
+   async executeSleep (options: ExecuteSleepStepOptions): Promise<ExecuteStepResult<any>> {
       const {
          ctx,
          job,
@@ -235,7 +238,7 @@ export class StepExecutor {
       }
    }
 
-   executeSleepUntil (options: ExecuteSleepUntilStepOptions): Promise<ExecuteStepResult> {
+   executeSleepUntil (options: ExecuteSleepUntilStepOptions): Promise<ExecuteStepResult<any>> {
       const stepState = this.jobExecutor.state.forStep(
         options.id,
         "sleep-until"

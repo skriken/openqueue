@@ -1,4 +1,7 @@
-import { StepExecutor } from "@/execution/executor.ts";
+import {
+   ExecuteStepResult,
+   StepExecutor
+} from "@/execution/executor.ts";
 import {
    JobLog,
    JobLogLevel
@@ -9,9 +12,9 @@ export type ExecutionContextOptions = {
    workflow: Workflow;
 };
 
-type RunOptions = {
+type RunOptions<Fn extends () => Promise<any>> = {
    id: string;
-   run: () => Promise<any>;
+   run: Fn;
 };
 type SleepOptions = {
    id: string;
@@ -29,12 +32,17 @@ export class ExecutionContext {
    constructor (public __options: ExecutionContextOptions) {
    }
 
-   run (options: RunOptions) {
+   async run<
+     Fn extends () => Promise<any>,
+     T = ReturnType<Fn> extends Promise<infer U> ? U : never
+   > (options: RunOptions<Fn>) {
       this.checkIsReady();
-      return this.__stepExecutor!.executeRun({
+      const executed = await this.__stepExecutor!.executeRun<T, ExecuteStepResult<T>>({
          id: options.id,
-         run: options.run
+         run: options.run as Fn
       });
+
+      return executed as ExecuteStepResult<T>;
    }
 
    sleep (options: SleepOptions) {

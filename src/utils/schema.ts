@@ -81,11 +81,11 @@ export type JobOrder = z.infer<typeof JobOrderSchema>;
 
 export const DefaultJobOptionsSchema = z.object({
    order: JobOrderSchema.default("fifo"),
-   retries: DefaultRetrySchema.optional(),
+   retries: DefaultRetrySchema.default({}),
    concurrency: DefaultConcurrencySchema.optional(),
    rateLimit: DefaultRateLimitSchema.optional(),
    delay: DefaultDelaySchema.optional(),
-   priority: DefaultPrioritySchema.optional(),
+   priority: DefaultPrioritySchema.default({}),
    removal: DefaultJobRemovalSchema.optional()
 });
 export type DefaultJobOptions = z.infer<typeof DefaultJobOptionsSchema>;
