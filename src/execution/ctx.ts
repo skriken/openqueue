@@ -24,6 +24,11 @@ type SleepUntilOptions = {
    id: string;
    timestamp: number;
 };
+type InvokeOptions<T = any> = {
+   id: string;
+   workflow: string;
+   data: T;
+};
 
 export class ExecutionContext {
    public __logs: JobLog[] = [];
@@ -65,8 +70,13 @@ export class ExecutionContext {
       throw new Error("Not implemented");
    }
 
-   invoke () {
-      throw new Error("Not implemented");
+   async invoke<T = any, R = any> (options: InvokeOptions<T>): Promise<ExecuteStepResult<R>> {
+      this.checkIsReady();
+      return this.__stepExecutor!.executeInvoke<T, R>({
+         id: options.id,
+         workflow: options.workflow,
+         data: options.data
+      });
    }
 
    setStepExecutor (executor: StepExecutor) {

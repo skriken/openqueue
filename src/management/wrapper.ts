@@ -46,6 +46,24 @@ export class Wrapper {
       this.__bullWorker.resume();
    }
 
+   async pause () {
+      if (this.__bullWorker) {
+         await this.__bullWorker.pause();
+      }
+      if (this.__bullQueue) {
+         await this.__bullQueue.pause();
+      }
+   }
+
+   async stop () {
+      if (this.__bullWorker) {
+         await this.__bullWorker.close();
+      }
+      if (this.__bullQueue) {
+         await this.__bullQueue.close();
+      }
+   }
+
    async setupQueue () {
       if (this.__bullQueue) {
          throw new Error("Queue already exists");
