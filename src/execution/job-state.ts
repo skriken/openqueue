@@ -242,6 +242,12 @@ export class JobStateManager {
 
    async updateData (): Promise<JobState> {
       const data = this.data;
+      
+      // Sync current step states before updating
+      if (data) {
+         data.__steps = this.getStepsData();
+      }
+      
       const parsed = JobStateSchema.parse(data);
 
       // Checks to prevent infinite nesting

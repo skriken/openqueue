@@ -60,11 +60,11 @@ const helloWorld = OpenQueue.workflow({
    schema: z.object({
       name: z.string()
    }),
-   async handle ({
+   fn: async ({
       ctx,
       job,
       data
-   }) {
+   }) => {
       await ctx.sleep({
          id: "wait-a-moment",
          duration: 1000
@@ -145,28 +145,34 @@ const greetNewUser = OpenQueue.workflow({
 
       const checkSubscription = await ctx.repeat({
          id: "check-subscription-for-7-days",
-         every: 864_000_000,
          limit: 7,
-         async run () {
+         every: 864_000_000,
+         run: async () => {
             const hasSubscribed = await db.hasUserSubscribed();
             if (hasSubscribed) {
 
-               // Returning a truthy value will mark thee repeat step as complete, and will not repeat anymore.
+               // Returning a truthy value will mark the repeat step as complete, and will not repeat anymore.
                return {
                   finally: "subscribed"
                };
             }
 
-            // Return falsy value to indicating it's not done
+            // Return falsy value to indicate it's not done
             return false;
-         },
+         }
       });
 
       if (!checkSubscription) {
-
+         // User didn't subscribe after 7 days
+         await sendFollowUpEmail(user.email);
       }
+
+      return {
+         userId: data.userId,
+         subscribed: !!checkSubscription
+      };
    }
-})
+});
 ```
 
 #### Setting up the client

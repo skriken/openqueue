@@ -48,11 +48,31 @@ export class OpenQueueClient<
    }
 
    async pause () {
-
+      // Pause all workflow workers and queues
+      await Promise.all(
+        Object.values(this.__workflows)
+          .map(async workflow => {
+             await workflow.__wrapper.pause();
+          })
+      );
    }
 
    async stop () {
-
+      // Stop all workflow workers and queues
+      await Promise.all(
+        Object.values(this.__workflows)
+          .map(async workflow => {
+             if (workflow.__wrapper.__bullWorker) {
+                await workflow.__wrapper.__bullWorker.close();
+             }
+             if (workflow.__wrapper.__bullQueue) {
+                await workflow.__wrapper.__bullQueue.close();
+             }
+          })
+      );
+      
+      // Close the Redis connection
+      await this.__connection.quit();
    }
 
    __getWorkflows () {
