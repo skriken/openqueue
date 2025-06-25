@@ -1,8 +1,11 @@
 {
   "name": "openqueue",
   "description": "A workflow queue system with Inngest-like DX. Highly opinionated & highly unrecommended for use in any application.",
-  "version": "2.0.0-alpha3",
+  "version": "2.0.1-alpha",
   "type": "module",
+  "scripts": {
+    "npm:publish": "bun publish"
+  },
   "exports": {
     ".": {
       "default": "./src/index.ts",
